@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:platform_device_id_platform_interface/platform_device_id_platform_interface.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -17,8 +17,9 @@ class PlatformDeviceId {
       if (kIsWeb) {
         deviceId = await PlatformDeviceIdPlatform.instance.getDeviceId();
       } else if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
-        deviceId = androidInfo.androidId;
+        // Use the platform channel directly for Android to retrieve ANDROID_ID.
+        const MethodChannel channel = MethodChannel('platform_device_id');
+        deviceId = await channel.invokeMethod<String>('getDeviceId');
       } else if (Platform.isIOS) {
         IosDeviceInfo iosInfo = await deviceInfoPlugin.iosInfo;
         deviceId = iosInfo.identifierForVendor;
